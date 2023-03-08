@@ -27,7 +27,6 @@
 //! currently selected orbiter.
 
 #![cfg_attr(not(feature = "std"), no_std)]
-#![feature(step_trait)]
 
 pub mod types;
 pub mod weights;
@@ -108,8 +107,7 @@ pub mod pallet {
 			+ Default
 			+ sp_runtime::traits::MaybeDisplay
 			+ sp_runtime::traits::AtLeast32Bit
-			+ Copy
-			+ core::iter::Step;
+			+ Copy;
 
 		/// Weight information for extrinsics in this pallet.
 		type WeightInfo: WeightInfo;
@@ -261,7 +259,10 @@ pub mod pallet {
 	}
 
 	#[pallet::call]
-	impl<T: Config> Pallet<T> {
+	impl<T: Config> Pallet<T>
+	where
+		core::ops::Range<<T as pallet::Config>::RoundIndex>: Iterator<Item = T::RoundIndex>,
+	{
 		/// Add an orbiter in a collator pool
 		#[pallet::call_index(0)]
 		#[pallet::weight(T::WeightInfo::collator_add_orbiter())]
@@ -427,7 +428,10 @@ pub mod pallet {
 		}
 	}
 
-	impl<T: Config> Pallet<T> {
+	impl<T: Config> Pallet<T>
+	where
+		core::ops::Range<<T as pallet::Config>::RoundIndex>: Iterator<Item = T::RoundIndex>,
+	{
 		fn do_remove_orbiter_from_pool(
 			collator: T::AccountId,
 			orbiter: T::AccountId,
